@@ -178,7 +178,6 @@ Func lower(Func func, std::ostream* os, bool time) {
   printCallGraph("Loops Unrolling", func, os);
 
   // Lower to GPU Kernels
-#if GPU
   if (kBackend == "gpu") {
     func = rewriteCallGraph(func, rewriteCompoundOps);
     printCallGraph("Rewrite Compound Ops (GPU)", func, os);
@@ -193,7 +192,6 @@ Func lower(Func func, std::ostream* os, bool time) {
     func = rewriteCallGraph(func, fuseKernels);
     printCallGraph("Fuse Kernels", func, os);
   }
-#endif
   return func;
 }
 

@@ -1,4 +1,4 @@
-if (CUDA_FOUND)
+if (True)
   message("-- Building with gpu-backend")
 
   set(SIMIT_DEFINITIONS ${SIMIT_DEFINITIONS} -DGPU)

@@ -19,3 +19,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 file(GLOB FEM3_SOURCE ${PROJECT_SOURCE_DIR}/static_scalar_3D.cpp)
 add_executable(static_scalar_3D ${FEM3_SOURCE})
 target_link_libraries(static_scalar_3D LINK_PUBLIC ${simit})
+
+# bx2k: legacy fem
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+file(GLOB LEGACY_SOURCE ${PROJECT_SOURCE_DIR}/fem.cpp)
+add_executable(legacy_fem ${LEGACY_SOURCE})
+target_link_libraries(legacy_fem LINK_PUBLIC ${simit})

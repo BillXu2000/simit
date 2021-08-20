@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
 project(simit)
+set(CMAKE_CXX_FLAGS "${C_CXX_FLAGS} -std=c++11 -DGPU")
 
 SET(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
@@ -62,7 +63,7 @@ if (DEFINED ENV{WERROR})
   message("-- Promoting warnings to errors")
 endif()
 set(CMAKE_C_FLAGS "${C_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${C_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${C_CXX_FLAGS} -std=c++11 -DGPU")
 
 set(SIMIT_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 set(SIMIT_TEST_DIR   ${CMAKE_CURRENT_LIST_DIR}/test)
