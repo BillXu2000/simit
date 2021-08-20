@@ -1,0 +1,101 @@
+ 9992  vim CMakeLists.txt
+ 9993  history | grep cmake
+ 9994  ls
+ 9995  cmake .. -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+ 9996  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+ 9997  rm -r build
+ 9998  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+ 9999  make -C build -j14
+10000  git status
+10001  cd apps
+10002  ls
+10003  cd springs
+10004  ls
+10005  cd build
+10006  ls
+10007  cd ..
+10008  rm -r build
+10009  cmake . -B build
+10010  make -C build -j14
+10011  cd build
+10012  ls
+10013  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10014  ls
+10015  rm *.obj
+10016  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10017  pwd | clip
+10018  cd ..
+10019  ls
+10020  vim esprings.sim
+10021  cd build
+10022  ls
+10023  history | grep nvprof
+10024  history | grep nv
+10025  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10026  nsys profile --stats=true ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10027  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7"
+10028  make -C build -j14
+10029  rm -r build
+10030  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7"
+10031  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS=""
+10032  make -C build -j14
+10033  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10034  nsys profile --stats=true ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10035  rm -r build
+10036  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10037  make -C build -j14
+10038  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10039  git status
+10040  git checkout bx2k
+10041  git status
+10042  git diff master
+10043  rm -r build
+10044  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10045  make -C build -j14
+10046  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10047  ls
+10048  history | grep cmake
+10049  cd ..
+10050  rm -r build
+10051  cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10052  make -C build -j14
+10053  cd build
+10054  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10055  cd ..
+10056  rm -r build
+10057  cmake . -B build
+10058  make -C build -j14
+10059  cd build
+10060  l
+10061  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10062  history | grep cmake
+10063  cd
+10064  vim .zsh_history
+10065  rm -r build
+10066  SIMIT_CUDA_ENABLE=1 cmake .. -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10067  SIMIT_CUDA_ENABLE=1 cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10068  make -C build -j14
+10069  cd git/simit
+10070  ls
+10071  cd apps
+10072  ls
+10073  cd springs
+10074  ls
+10075  rm -r build
+10076  cmake . -B build
+10077  make -C build -j14
+10078  cd sp
+10079  cd build
+10080  ls
+10081  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10082  ls
+10083* vim CMakeLists.txt
+10084* rm -r build
+10085* SIMIT_CUDA_ENABLE=1 cmake . -B build -DCMAKE_CXX_COMPILER="g++-7" -DCMAKE_CXX_FLAGS="-DGPU"
+10086* make -C build -j14
+10087  ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10088  nsys profile --stats=true ./springs ../esprings.sim ../../data/tet-bunny/bunny.1
+10089  ls
+10090  history | tail 100
+10091  history | tail 
+
