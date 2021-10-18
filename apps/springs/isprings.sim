@@ -79,7 +79,7 @@ export func timestep()
   var p = r;
   var iter = 0;
   var normr2 = r'*r;
-  while (normr2 > 1e-12) and (iter < 50)
+  while (iter < 50)
     Ap = MDK * p;
     denom = p'*Ap;
     alpha = normr2 / denom;

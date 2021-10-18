@@ -13,8 +13,8 @@ end
 extern points  : set{Point};
 extern springs : set{Spring}(points,points);
 
-const g    = [0.0, -9.81, 0.0]';
-const h    = 1e-6;
+const g    = [0.0, -0.981, 0.0]';
+const h    = 5e-8;
 const damp = 0.01;
 
 func acceleration(s : Spring, p : (Point*2))
@@ -26,10 +26,10 @@ func acceleration(s : Spring, p : (Point*2))
   fe0 = f*U;
 
   if not p(0).fixed
-    a(p(0)) =  (1.0/p(0).m) * fe0 + g;
+    a(p(0)) =  fe0 + g;
   end
   if not p(1).fixed
-    a(p(1)) = -(1.0/p(1).m) * fe0 + g;
+    a(p(1)) = -fe0 + g;
   end
 end
 

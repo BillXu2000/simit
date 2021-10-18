@@ -2,6 +2,7 @@
 #include "program.h"
 #include "mesh.h"
 #include <cmath>
+#include <chrono>
 
 using namespace simit;
 
@@ -28,7 +29,7 @@ int main(int argc, char **argv)
 
   // Move the data to a floor and normalize to 1
   std::array< float,3> mn = hack(mesh.v[0]), mx = hack(mesh.v[0]);
-  for(size_t vi = 1; vi < mesh.v.size(); vi++) {
+  for(size_t vi = 0; vi < mesh.v.size(); vi++) {
     for(int i = 0; i < 3; i++) {
       mn[i] = std::min(float(mesh.v[vi][i]), mn[i]);
       mx[i] = std::max(float(mesh.v[vi][i]), mx[i]);
@@ -36,7 +37,7 @@ int main(int argc, char **argv)
   }
   for(size_t vi = 0; vi<mesh.v.size(); vi++) {
     for(int i = 0; i<3; i++) {
-      mesh.v[vi][i] = (mesh.v[vi][i] - mn[i]) / (mx[i] - mn[i]);
+      mesh.v[vi][i] = (mesh.v[vi][i] - mn[2]) / (mx[2] - mn[2]);
     }
   }
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
   Set points;
   Set springs(points, points);
 
-  float stiffness = 1e4;
+  float stiffness = 1e3;
   float density   = 1e3;
   float radius    = 0.01;
   float pi        = 3.14159265358979;
@@ -106,7 +107,19 @@ int main(int argc, char **argv)
   timestep.init();
 
   // Take 100 time steps
-  for (int i = 1; i <= 100; ++i) {
+  for (int i = 1; i <= 1; ++i) {
+
+    
+    timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int j = 0; j < 1000; j++) {
+    timestep.run();       // Run the timestep function
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration<double>(end - start).count() << "\n";
+    timestep.mapArgs();   // Move data back to this memory space
+
+    // Copy the x field to the mesh and save it to an obj file
     std::cout << "timestep " << i << std::endl;
     int vi = 0;
     for (auto &vert : points) {
@@ -117,14 +130,12 @@ int main(int argc, char **argv)
     }
     mesh.updateSurfVert();
     mesh.saveTetObj(std::to_string(i)+".obj");
-
-    
-    timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
-    for (int j = 0; j < 100; j++) {
-    timestep.run();       // Run the timestep function
+    float sum = 0;
+    for(size_t vi = 0; vi<mesh.v.size(); vi++) {
+      for(int i = 0; i<3; i++) {
+        sum += float(mesh.v[vi][i]);
+      }
     }
-    timestep.mapArgs();   // Move data back to this memory space
-
-    // Copy the x field to the mesh and save it to an obj file
+    printf("%f\n", sum / mesh.v.size() / 3);
   }
 }
