@@ -13,9 +13,9 @@ end
 extern points  : set{Point};
 extern springs : set{Spring}(points,points);
 
-const g    = [0.0, -0.981, 0.0]';
-const h    = 5e-8;
-const damp = 0.01;
+const g    = [0.0, 9.8, 0.0]';
+const h    = 2e-4;
+%const damp = 0.01;
 
 func acceleration(s : Spring, p : (Point*2))
     -> a : vector[points](vector[3](float))
@@ -26,15 +26,23 @@ func acceleration(s : Spring, p : (Point*2))
   fe0 = f*U;
 
   if not p(0).fixed
-    a(p(0)) =  fe0 + g;
+    a(p(0)) =  fe0 / p(0).m;
   end
   if not p(1).fixed
-    a(p(1)) = -fe0 + g;
+    a(p(1)) = -fe0 / p(1).m;
+  end
+end
+
+func acc(p: Point)
+    -> aa : vector[points](vector[3](float))
+  if not p.fixed
+    aa(p) = g;
   end
 end
 
 export func timestep()
   a = map acceleration to springs reduce +;
-  points.v = (1.0 - damp) * points.v + h*a;
-  points.x = points.x + points.v;
+  aa = map acc to points reduce +;
+  points.v = points.v + h*(a + aa);
+  points.x = points.x + points.v * h;
 end

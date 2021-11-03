@@ -10,6 +10,39 @@ std::array<float, 3> hack(std::array<double, 3> k) {
   return {float(k[0]), float(k[1]), float(k[2])};
 }
 
+class float3 {
+public:
+  float x[3];
+
+  float3() {}
+
+  float3(float *k) {
+    for (int i = 0; i < 3; i++) x[i] = k[i];
+  }
+
+  float3(std::array<double, 3> k) {
+    for (int i = 0; i < 3; i++) x[i] = k[i];
+  }
+
+  float operator () (int i) {
+    return x[i];
+  }
+};
+
+float3 operator - (float3 a, float3 b) {
+  float ans[] = {a(0) - b(0), a(1) - b(1), a(2) - b(2)};
+  return float3(ans);
+}
+
+float determinant(float3 a, float3 b, float3 c) {
+  float ans = 0;
+  for (int i = 0; i < 3; i++) {
+    ans += a(i) * b((i + 1) % 3) * c((i + 2) % 3);
+    ans -= a(i) * b((i + 2) % 3) * c((i + 1) % 3);
+  }
+  return ans;
+}
+
 int main(int argc, char **argv)
 {
   if (argc != 3) {
@@ -35,9 +68,10 @@ int main(int argc, char **argv)
       mx[i] = std::max(float(mesh.v[vi][i]), mx[i]);
     }
   }
+  int fix_axis = 1;
   for(size_t vi = 0; vi<mesh.v.size(); vi++) {
     for(int i = 0; i<3; i++) {
-      mesh.v[vi][i] = (mesh.v[vi][i] - mn[2]) / (mx[2] - mn[2]);
+      mesh.v[vi][i] = (mesh.v[vi][i] - mn[i]) / (mx[fix_axis] - mn[fix_axis]);
     }
   }
 
@@ -45,7 +79,7 @@ int main(int argc, char **argv)
   Set points;
   Set springs(points, points);
 
-  float stiffness = 1e3;
+  float stiffness = std::stof(std::getenv("__stiffness"));
   float density   = 1e3;
   float radius    = 0.01;
   float pi        = 3.14159265358979;
@@ -68,11 +102,28 @@ int main(int argc, char **argv)
 
     x.set(point, vertex);
     v.set(point, {0.0, 0.0, 0.0});
-    fixed.set(point, vertex[2] < zfloor);
+    fixed.set(point, vertex[fix_axis] < zfloor);
   }
 
   // Compute point masses
   std::vector<float> pointMasses(mesh.v.size(), 0.0);
+  /*for (int i = 0; i < 10; i++) {
+    printf("i = %d ", i);
+    for (auto j : mesh.e[i]) {
+      printf("%d ", j);
+    }
+    puts("");
+  }*/
+  /*for (auto e: mesh.e) {
+    float3 k[3];
+    for (int i = 0; i < 3; i++) {
+      k[i] = float3(mesh.v[e[i]]) - float3(mesh.v[e[3]]);
+    }
+    float vol = abs(determinant(k[0], k[1], k[2]) / 6.0);
+    for (int i = 0; i < 4; i++) {
+      pointMasses[e[i]] += vol / 4.0;
+    }
+  }*/
 
   for(auto e : mesh.edges) {
     float dx[3];
@@ -85,14 +136,16 @@ int main(int argc, char **argv)
     float l0_ = sqrt(dx[0]*dx[0] + dx[1]*dx[1] + dx[2]*dx[2]);
     float vol = pi*radius*radius*l0_;
     float mass = vol*density;
-    pointMasses[e[0]] += 0.5*mass;
-    pointMasses[e[1]] += 0.5*mass;
+    //pointMasses[e[0]] += 0.5*mass;
+    //pointMasses[e[1]] += 0.5*mass;
     ElementRef spring = springs.add(pointRefs[e[0]], pointRefs[e[1]]);
     l0.set(spring, l0_);
+    //k.set(spring, stiffness * l0_);
     k.set(spring, stiffness);
   }
   for(size_t i = 0; i < mesh.v.size(); ++i) {
     ElementRef p = pointRefs[i];
+    pointMasses[i] = 1.0 / mesh.v.size();
     m.set(p, pointMasses[i]);
   }
 
@@ -107,20 +160,20 @@ int main(int argc, char **argv)
   timestep.init();
 
   // Take 100 time steps
-  for (int i = 1; i <= 1; ++i) {
+  for (int i = 1; i <= 100; ++i) {
 
     
     timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
     auto start = std::chrono::high_resolution_clock::now();
-    for (int j = 0; j < 1000; j++) {
+    for (int j = 0; j < 100; j++) {
     timestep.run();       // Run the timestep function
     }
     auto end = std::chrono::high_resolution_clock::now();
-    std::cout << std::chrono::duration<double>(end - start).count() << "\n";
+    //std::cout << std::chrono::duration<double>(end - start).count() << "\n";
     timestep.mapArgs();   // Move data back to this memory space
 
     // Copy the x field to the mesh and save it to an obj file
-    std::cout << "timestep " << i << std::endl;
+    //std::cout << "timestep " << i << std::endl;
     int vi = 0;
     for (auto &vert : points) {
       for(int ii = 0; ii < 3; ii++){
@@ -130,12 +183,18 @@ int main(int argc, char **argv)
     }
     mesh.updateSurfVert();
     mesh.saveTetObj(std::to_string(i)+".obj");
-    float sum = 0;
+    float sum[4];
+    memset(sum, 0, sizeof(sum));
     for(size_t vi = 0; vi<mesh.v.size(); vi++) {
       for(int i = 0; i<3; i++) {
-        sum += float(mesh.v[vi][i]);
+        float product = 1;
+        for (int k = 0; k < 4; k++) {
+          sum[k] += product;
+          product *= mesh.v[vi][i];
+        }
       }
     }
-    printf("%f\n", sum / mesh.v.size() / 3);
+    printf("%f %f %f %f\n", sum[0], sum[1], sum[2], sum[3]);
   }
+  return 0;
 }
