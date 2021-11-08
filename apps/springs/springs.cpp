@@ -160,15 +160,16 @@ int main(int argc, char **argv)
   timestep.init();
 
   // Take 100 time steps
-  for (int i = 1; i <= 100; ++i) {
+  timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
+  for (int i = 1; i <= 300; ++i) {
 
     
-    timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
     auto start = std::chrono::high_resolution_clock::now();
     for (int j = 0; j < 100; j++) {
     timestep.run();       // Run the timestep function
     }
     auto end = std::chrono::high_resolution_clock::now();
+    /*
     //std::cout << std::chrono::duration<double>(end - start).count() << "\n";
     timestep.mapArgs();   // Move data back to this memory space
 
@@ -195,6 +196,7 @@ int main(int argc, char **argv)
       }
     }
     printf("%f %f %f %f\n", sum[0], sum[1], sum[2], sum[3]);
+    timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)*/
   }
   return 0;
 }
