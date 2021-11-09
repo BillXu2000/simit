@@ -79,7 +79,7 @@ int main(int argc, char **argv)
   Set points;
   Set springs(points, points);
 
-  float stiffness = std::stof(std::getenv("__stiffness"));
+  float stiffness = 1e1;
   float density   = 1e3;
   float radius    = 0.01;
   float pi        = 3.14159265358979;

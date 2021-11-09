@@ -14,7 +14,7 @@ extern points  : set{Point};
 extern springs : set{Spring}(points,points);
 
 const g    = [0.0, 9.8, 0.0]';
-const h    = 2e-4;
+const h    = 2e-5;
 %const damp = 0.01;
 
 func acceleration(s : Spring, p : (Point*2))
