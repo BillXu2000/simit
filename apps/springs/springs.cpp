@@ -87,13 +87,14 @@ int main(int argc, char **argv)
 
   // The fields of the points set 
   FieldRef<float,3> x     = points.addField<float,3>("x");
+  FieldRef<float,3> ox     = points.addField<float,3>("ox");
   FieldRef<float,3> v     = points.addField<float,3>("v");
   FieldRef<float>   m     = points.addField<float>("m");
   FieldRef<bool>     fixed = points.addField<bool>("fixed");
 
   // The fields of the springs set 
   FieldRef<float> k  = springs.addField<float>("k");
-  FieldRef<float> l0 = springs.addField<float>("l0");
+  //FieldRef<float> l0 = springs.addField<float>("l0");
 
   std::vector<ElementRef> pointRefs;
   for(auto vertex : mesh.v) {
@@ -101,6 +102,7 @@ int main(int argc, char **argv)
     pointRefs.push_back(point);
 
     x.set(point, vertex);
+    ox.set(point, vertex);
     v.set(point, {0.0, 0.0, 0.0});
     fixed.set(point, vertex[fix_axis] < zfloor);
   }
@@ -139,7 +141,7 @@ int main(int argc, char **argv)
     //pointMasses[e[0]] += 0.5*mass;
     //pointMasses[e[1]] += 0.5*mass;
     ElementRef spring = springs.add(pointRefs[e[0]], pointRefs[e[1]]);
-    l0.set(spring, l0_);
+    //l0.set(spring, l0_);
     //k.set(spring, stiffness * l0_);
     k.set(spring, stiffness);
   }
