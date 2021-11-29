@@ -11,3 +11,8 @@ release
 /.project
 /.settings/
 /.cproject
+*.qdrep
+*.sqlite
+simit.sim
+simit.linker.log
+timer.log

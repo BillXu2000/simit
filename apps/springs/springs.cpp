@@ -3,6 +3,7 @@
 #include "mesh.h"
 #include <cmath>
 #include <chrono>
+#include <fstream>
 
 using namespace simit;
 
@@ -45,20 +46,22 @@ float determinant(float3 a, float3 b, float3 c) {
 
 int main(int argc, char **argv)
 {
-  if (argc != 3) {
+  if (argc < 3) {
     std::cerr << "Usage: springs <path to simit code> <path to data>" << std::endl;
     return -1;
   }
   std::string codefile = argv[1];
   std::string datafile = argv[2];
 
-  simit::init("gpu", sizeof(float));
+  if (argc >= 4 && std::string(argv[3]) == "cpu") simit::init("cpu", sizeof(float));
+  else simit::init("gpu", sizeof(float));
 
   // Load mesh data using Simit's mesh loader.
   MeshVol mesh;
   mesh.loadTet(datafile+".node", datafile+".ele");
   mesh.loadTetEdge(datafile+".edge");
-  mesh.makeTetSurf();
+  //mesh.makeTetSurf();
+  puts("hello");
 
   // Move the data to a floor and normalize to 1
   std::array< float,3> mn = hack(mesh.v[0]), mx = hack(mesh.v[0]);
@@ -163,14 +166,19 @@ int main(int argc, char **argv)
 
   // Take 100 time steps
   timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
-  for (int i = 1; i <= 300; ++i) {
+  double timer = 0;
+  int num_run = 2, num_step = 10;
+  timestep.run();       // Run the timestep function
+  puts("hello");
+  for (int i = 1; i <= num_run; ++i) {
 
     
     auto start = std::chrono::high_resolution_clock::now();
-    for (int j = 0; j < 100; j++) {
+    for (int j = 0; j < num_step; j++) {
     timestep.run();       // Run the timestep function
     }
     auto end = std::chrono::high_resolution_clock::now();
+    timer += std::chrono::duration<double>(end - start).count();
     /*
     //std::cout << std::chrono::duration<double>(end - start).count() << "\n";
     timestep.mapArgs();   // Move data back to this memory space
@@ -200,5 +208,7 @@ int main(int argc, char **argv)
     printf("%f %f %f %f\n", sum[0], sum[1], sum[2], sum[3]);
     timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)*/
   }
+  std::fstream out("timer.log", std::fstream::out);
+  out << timer / (num_run * num_step) << "\n" << (num_run * num_step) << "\n";
   return 0;
 }
