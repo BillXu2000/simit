@@ -58,8 +58,14 @@ int main(int argc, char **argv)
 
   // Load mesh data using Simit's mesh loader.
   MeshVol mesh;
-  mesh.loadTet(datafile+".node", datafile+".ele");
-  mesh.loadTetEdge(datafile+".edge");
+  if (datafile.substr(datafile.size() - 3) == "obj") {
+    std::fstream in(datafile, std::fstream::in);
+    mesh.load_obj(in);
+  }
+  else {
+    mesh.loadTet(datafile+".node", datafile+".ele");
+    mesh.loadTetEdge(datafile+".edge");
+  }
   //mesh.makeTetSurf();
   puts("hello");
 
@@ -167,7 +173,7 @@ int main(int argc, char **argv)
   // Take 100 time steps
   timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
   double timer = 0;
-  int num_run = 2, num_step = 10;
+  int num_run = 2, num_step = 100;
   timestep.run();       // Run the timestep function
   puts("hello");
   for (int i = 1; i <= num_run; ++i) {

@@ -63,6 +63,8 @@ struct MeshVol{
   int loadTetEdge(std::string edgeFile);
   int loadTetEdge(std::istream & edgeIn);
 
+  int load_obj(std::istream &in);
+
   ///return -1 if failed to save
   int save(const char * filename);
   int save(std::string filename);

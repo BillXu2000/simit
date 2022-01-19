@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <set>
 #include "mesh.h"
 
 using namespace simit;
@@ -225,6 +226,73 @@ int MeshVol::save(ostream & out)
     out<<"\n";
   }
   
+  return 0;
+}
+
+int MeshVol::load_obj(istream & in)
+{
+  string line;
+  string vTok("v");
+  string fTok("f");
+  char bslash='/',space=' ';
+  string tok;
+  set<array<int, 2> > obj_edges;
+  auto add_edge = [&](int u, int v) {
+    if (u > v) swap(u, v);
+    obj_edges.insert({u, v});
+  };
+  while(1) {
+    getline(in,line);
+    if(in.eof()) {
+      break;
+    }
+    if(line == "#end"){
+      break;
+    }
+    if(line.size()<3) {
+      continue;
+    }
+    if(line.at(0)=='#') {
+      continue;
+    }
+    stringstream ss(line);
+    ss>>tok;
+    if(tok==vTok) {
+      Vector3d vec;
+      ss>>vec[0]>>vec[1]>>vec[2];
+      v.push_back(vec);
+    } else if(tok==fTok) {
+      bool hasTexture = false;
+      if (line.find(bslash) != string::npos) {
+        replace(line.begin(), line.end(), bslash, space);
+        hasTexture = true;
+      }
+      stringstream facess(line);
+      facess>>tok;
+      vector<int> vidx;
+      int x;
+      while(facess>>x){
+        vidx.push_back(x);
+        if(hasTexture){
+          facess>>x;
+        }
+      }
+      for(unsigned ii = 0;ii<vidx.size()-2;ii++){
+        Vector3i trig;
+        trig[0] = vidx[0]-1;
+        for (int jj = 1; jj < 3; jj++) {
+          trig[jj] = vidx[ii+jj]-1;
+        }
+        add_edge(trig[0], trig[1]);
+        add_edge(trig[1], trig[2]);
+        add_edge(trig[2], trig[0]);
+      }
+    }
+  }
+  for (auto i : obj_edges) {
+    edges.push_back(i);
+  }
+  e.push_back({0, 1, 2, 3});
   return 0;
 }
 
