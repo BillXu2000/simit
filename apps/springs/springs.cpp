@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
   // The fields of the springs set 
   FieldRef<float> k  = springs.addField<float>("k");
-  //FieldRef<float> l0 = springs.addField<float>("l0");
+  FieldRef<float> l0 = springs.addField<float>("l0");
 
   std::vector<ElementRef> pointRefs;
   for(auto vertex : mesh.v) {
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     //pointMasses[e[0]] += 0.5*mass;
     //pointMasses[e[1]] += 0.5*mass;
     ElementRef spring = springs.add(pointRefs[e[0]], pointRefs[e[1]]);
-    //l0.set(spring, l0_);
+    l0.set(spring, l0_);
     //k.set(spring, stiffness * l0_);
     k.set(spring, stiffness);
   }
@@ -173,9 +173,10 @@ int main(int argc, char **argv)
   // Take 100 time steps
   timestep.unmapArgs(); // Move data to compute memory space (e.g. GPU)
   double timer = 0;
-  int num_run = 2, num_step = 100;
+  int num_run = 2, num_step = 1000;
   timestep.run();       // Run the timestep function
   puts("hello");
+  //if (argc < 4) num_step = 20000;
   for (int i = 1; i <= num_run; ++i) {
 
     
